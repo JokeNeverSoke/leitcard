@@ -15,7 +15,7 @@ import {
   Toolbar,
 } from "@material-ui/core";
 import ReactCardFlip from "react-card-flip";
-import ReactMarkdown from "react-markdown";
+import Markdown from "markdown-to-jsx";
 import { VictoryBar, VictoryChart, VictoryAxis } from "victory";
 import { useSnackbar } from "notistack";
 
@@ -53,7 +53,7 @@ const Left = () => {
           <CardHeader title={`Level ${curCard.status + 1}`} />
           <CardContent style={{ textAlign: "center" }}>
             <Typography>
-              <ReactMarkdown>{curCard.question}</ReactMarkdown>
+              <Markdown>{curCard.question}</Markdown>
             </Typography>
           </CardContent>
         </Card>
@@ -62,7 +62,7 @@ const Left = () => {
           <CardHeader title={`Answer`} />
           <CardContent style={{ textAlign: "center" }}>
             <Typography>
-              <ReactMarkdown>{curCard.answer}</ReactMarkdown>
+              <Markdown>{curCard.answer}</Markdown>
             </Typography>
           </CardContent>
           <CardActions>
