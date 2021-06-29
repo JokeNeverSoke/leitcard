@@ -8,12 +8,15 @@ import {
   CardHeader,
   Container,
   Grid,
+  IconButton,
   List,
   ListItem,
   Paper,
   TextField,
   Toolbar,
+  Typography,
 } from "@material-ui/core";
+import GitHubIcon from "@material-ui/icons/GitHub";
 import ReactCardFlip from "react-card-flip";
 import Markdown from "markdown-to-jsx";
 import { VictoryBar, VictoryChart, VictoryAxis } from "victory";
@@ -35,7 +38,6 @@ import {
   updatePostToDB,
   syncEnum,
 } from "./store/cards";
-import { Typography } from "@material-ui/core";
 
 const Left = () => {
   const dispatch = useAppDispatch();
@@ -214,7 +216,15 @@ const App = () => {
     <>
       <AppBar position="static">
         <Toolbar>
-          <Typography variant="h6">LeitCard</Typography>
+          <Typography variant="h6" style={{ flexGrow: 1 }}>
+            LeitCard
+          </Typography>
+          <IconButton
+            href="https://github.com/jokeneversoke/leitcard"
+            target="_blank"
+          >
+            <GitHubIcon style={{ color: "white" }} />
+          </IconButton>
         </Toolbar>
       </AppBar>
       <Container>
