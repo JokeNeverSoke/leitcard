@@ -1,5 +1,36 @@
-import { createSlice, PayloadAction, nanoid } from "@reduxjs/toolkit";
+import {
+  createSlice,
+  PayloadAction,
+  nanoid,
+  createAsyncThunk,
+} from "@reduxjs/toolkit";
+import dayjs from "dayjs";
 import { generateSchedule } from "../utils/generateSchedule";
+import {
+  addCardToDB,
+  getLevelsFromDB,
+  updatePostFromDB,
+  findCardByIdFromDB,
+} from "../services/cards";
+import { RootState } from ".";
+import { getEnum, setEnum } from "../services/schedule";
+
+declare global {
+  interface Card {
+    id: string;
+    status: number | "grad";
+    question: string;
+    answer: string;
+    lastEnum: number;
+    creationTime: ReturnType<dayjs.Dayjs["format"]>;
+  }
+
+  interface ActiveCard extends Card {
+    status: Exclude<Card["status"], "grad">;
+  }
+
+  type Schedule = Array<[number, number]>;
+}
 
 interface CardsState {
   levels: Array<ActiveCard[]>;
@@ -26,32 +57,81 @@ const removeCardFromDeck = <T extends Card | ActiveCard>(
   return deck.filter((c) => c.id !== card.id);
 };
 
+export const fetchLevelFromDB = createAsyncThunk(
+  "cards/fetchLevelFromDb",
+  async (level: number, {}) => {
+    return { level, cards: await getLevelsFromDB(level) };
+  }
+);
+
+export const upgradeCard = createAsyncThunk(
+  "cards/upgradeCard",
+  async (card: ActiveCard, { getState, dispatch }) => {
+    const state = getState() as RootState;
+    const nextLevel =
+      card.status === state.cards.levels.length - 1 ? "grad" : card.status + 1;
+    const currentEnum = state.cards.currentEnum;
+    dispatch(
+      updatePostToDB({ ...card, status: nextLevel, lastEnum: currentEnum })
+    );
+  }
+);
+
+export const resetCard = createAsyncThunk(
+  "cards/resetCard",
+  async (card: ActiveCard, { getState, dispatch }) => {
+    const state = getState() as RootState;
+    const nextLevel = 0;
+
+    const currentEnum = state.cards.currentEnum;
+    dispatch(
+      updatePostToDB({ ...card, status: nextLevel, lastEnum: currentEnum })
+    );
+  }
+);
+
+export const updatePostToDB = createAsyncThunk(
+  "cards/updatePostToDB",
+  async (card: Card, {}) => {
+    const oldCard = await findCardByIdFromDB(card.id);
+    if (!oldCard || !isActive(oldCard))
+      throw "inactive card cannot be modified";
+    await updatePostFromDB(card);
+    return { card, oldCard };
+  }
+);
+
+export const addCard = createAsyncThunk(
+  "cards/addCard",
+  async (card: Omit<Card, "id" | "creationTime" | "lastEnum" | "status">) => {
+    const newCard: ActiveCard = {
+      ...card,
+      id: nanoid(),
+      creationTime: dayjs().format(),
+      lastEnum: -1,
+      status: 0,
+    };
+    await addCardToDB(newCard);
+    return newCard;
+  }
+);
+
+export const incrementDate = () => {
+  return (
+    dispatch: (arg0: { payload: number | undefined; type: string }) => void,
+    getState: () => RootState
+  ) => {
+    const oldState = getState();
+    const newDate = oldState.cards.currentEnum + 1;
+    setEnum(newDate);
+    dispatch(changeDate(newDate));
+  };
+};
+
 export const cardsSlice = createSlice({
   name: "cards",
   initialState,
   reducers: {
-    moveCard: (
-      state,
-      action: PayloadAction<{ to: Card["status"]; card: Card }>
-    ) => {
-      const { to, card } = action.payload;
-      let newCard: Card;
-      if (!isActive(card)) {
-        newCard = state.grads.splice(state.grads.indexOf(card), 1)[0];
-      } else {
-        const from = card.status;
-        newCard = state.levels[from].splice(
-          state.levels[from].indexOf(card),
-          1
-        )[0];
-      }
-      newCard.status = to;
-      if (!isActive(newCard)) {
-        state.grads.push(newCard);
-      } else {
-        state.levels[newCard.status].push(newCard);
-      }
-    },
     deleteCard: (state, action: PayloadAction<Card>) => {
       const card = action.payload;
       if (!isActive(card)) {
@@ -59,26 +139,6 @@ export const cardsSlice = createSlice({
       } else {
         const from = card.status;
         state.levels[from].splice(state.levels[from].indexOf(card));
-      }
-    },
-    upgradeCard: (state, action: PayloadAction<ActiveCard>) => {
-      const card = action.payload;
-      const nextLevel =
-        card.status === state.levels.length - 1 ? "grad" : card.status + 1;
-      console.log(card.status, nextLevel);
-      state.levels[card.status] = removeCardFromDeck(
-        state.levels[card.status],
-        card
-      );
-      const newCard: Card = {
-        ...card,
-        status: nextLevel,
-        lastEnum: state.currentEnum,
-      };
-      if (isActive(newCard)) {
-        state.levels[newCard.status].push(newCard);
-      } else {
-        state.grads.push(newCard);
       }
     },
     resetCard: (state, action: PayloadAction<ActiveCard>) => {
@@ -113,7 +173,7 @@ export const cardsSlice = createSlice({
           ...card,
           id: nanoid(),
           lastEnum: -1,
-          creationTime: new Date().toISOString(),
+          creationTime: dayjs().format(),
           status: 0,
         };
         return {
@@ -132,20 +192,54 @@ export const cardsSlice = createSlice({
         };
       },
     },
-    incrementDate: (state) => {
-      state.currentEnum++;
+    changeDate: (state, action: PayloadAction<number | undefined>) => {
+      const n = action.payload;
+      if (n) {
+        state.currentEnum = n;
+      } else {
+        state.currentEnum++;
+      }
     },
+    syncEnum: {
+      reducer(state, action: PayloadAction<number>) {
+        state.currentEnum = action.payload;
+      },
+      prepare() {
+        const currentEnum = getEnum();
+        return { payload: currentEnum };
+      },
+    },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(fetchLevelFromDB.fulfilled, (state, { payload }) => {
+      state.levels[payload.level] = payload.cards;
+    });
+    builder.addCase(updatePostToDB.fulfilled, (state, { payload }) => {
+      const { card, oldCard } = payload;
+      const from = oldCard.status;
+      state.levels[from] = removeCardFromDeck(
+        state.levels[oldCard.status],
+        oldCard
+      );
+      if (isActive(card)) {
+        state.levels[card.status].push(card);
+      } else {
+        state.grads.push(card);
+      }
+    });
+    builder.addCase(addCard.fulfilled, (state, { payload }) => {
+      const card = payload;
+      const to = payload.status;
+      state.levels[to].push(card);
+    });
   },
 });
 
 export const {
-  moveCard,
   deleteCard,
-  addCard,
-  upgradeCard,
-  resetCard,
   refreshSchedule,
-  incrementDate,
+  changeDate,
+  syncEnum,
 } = cardsSlice.actions;
 
 export default cardsSlice.reducer;

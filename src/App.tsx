@@ -28,10 +28,12 @@ import {
 } from "./store";
 import {
   addCard,
+  fetchLevelFromDB,
   incrementDate,
-  moveCard,
   resetCard,
   upgradeCard,
+  updatePostToDB,
+  syncEnum,
 } from "./store/cards";
 import { Typography } from "@material-ui/core";
 
@@ -46,6 +48,12 @@ const Left = () => {
     .concat(currentCards)
     .filter((c) => c.lastEnum < currentEnum);
   const curCard = cards[0];
+  useEffect(() => {
+    [0, 1, 2, 3, 4, 5, 6].forEach((level) => {
+      dispatch(fetchLevelFromDB(level));
+    });
+    dispatch(syncEnum());
+  }, []);
   if (cards.length) {
     return (
       <ReactCardFlip isFlipped={flipped} infinite>
@@ -93,7 +101,17 @@ const Left = () => {
   } else {
     return (
       <Card>
-        <CardContent>You're all done for today!</CardContent>
+        <CardContent style={{ textAlign: "center" }}>
+          <Typography variant="body1">You're all done for today!</Typography>
+          <Button
+            onClick={() => {
+              dispatch(incrementDate());
+            }}
+            color="primary"
+          >
+            Proceed to next day
+          </Button>
+        </CardContent>
       </Card>
     );
   }
@@ -192,7 +210,6 @@ const Amount = () => {
 };
 
 const App = () => {
-  const dispatch = useAppDispatch();
   return (
     <>
       <AppBar position="static">
@@ -204,13 +221,6 @@ const App = () => {
         <Top />
 
         <Amount />
-        <Button
-          onClick={() => {
-            dispatch(incrementDate());
-          }}
-        >
-          Next Day
-        </Button>
       </Container>
     </>
   );
