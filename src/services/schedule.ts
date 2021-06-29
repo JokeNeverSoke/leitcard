@@ -6,6 +6,7 @@ export const getEnum = () => {
   if (k) {
     return JSON.parse(k) as number;
   } else {
-    throw "no enum";
+    localStorage.setItem("enum", JSON.stringify(0));
+    return 0;
   }
 };
