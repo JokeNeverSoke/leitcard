@@ -12,7 +12,6 @@ import {
   useTheme,
   Heading,
 } from "@chakra-ui/react";
-import GitHubIcon from "@material-ui/icons/GitHub";
 import ReactCardFlip from "react-card-flip";
 import Markdown from "markdown-to-jsx";
 import { VictoryBar, VictoryChart, VictoryAxis, VictoryLabel } from "victory";
