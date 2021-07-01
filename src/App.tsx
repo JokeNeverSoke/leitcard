@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   useToast,
   Button,
@@ -11,6 +11,11 @@ import {
   SimpleGrid,
   useTheme,
   Heading,
+  EditablePreview,
+  useControllableState,
+  useDisclosure,
+  Tooltip,
+  Switch,
 } from "@chakra-ui/react";
 import ReactCardFlip from "react-card-flip";
 import Markdown from "markdown-to-jsx";
@@ -34,6 +39,30 @@ import {
 } from "./store/cards";
 import { AddIcon } from "@chakra-ui/icons";
 
+const Card = (props: React.ComponentProps<typeof Box>) => {
+  return (
+    <Box
+      borderRadius="lg"
+      boxShadow="lg"
+      border="1px"
+      borderColor="gray.200"
+      {...props}
+    />
+  );
+};
+
+const CardContent = (props: React.ComponentProps<typeof Box>) => {
+  return (
+    <Box
+      borderBottom="solid 1px"
+      borderColor="gray.200"
+      py={2}
+      px={5}
+      {...props}
+    />
+  );
+};
+
 const Left = () => {
   const dispatch = useAppDispatch();
   const levels = useAppSelector(selectTodayLevel);
@@ -54,36 +83,25 @@ const Left = () => {
   if (cards.length) {
     return (
       <ReactCardFlip isFlipped={flipped} infinite>
-        <Box
-          onClick={() => setFlipped(!flipped)}
-          key="front"
-          borderRadius="lg"
-          boxShadow="lg"
-          border="1px"
-          borderColor="gray.200"
-        >
-          <Box borderBottom="solid 1px" borderColor="gray.200" py={2} px={5}>
-            {`Level ${curCard.status + 1}`}
-          </Box>
-          <Box py={3} px={5} textAlign="center">
+        <Card onClick={() => setFlipped(!flipped)} key="front">
+          <CardContent>{`Level ${curCard.status + 1}`}</CardContent>
+          <CardContent textAlign="center">
             <Text>
               <Markdown>{curCard.question}</Markdown>
             </Text>
-          </Box>
-        </Box>
+          </CardContent>
+        </Card>
 
-        <Box
-          onClick={() => setFlipped(!flipped)}
-          key="back"
-          borderRadius="lg"
-          boxShadow="lg"
-          border="1px"
-          borderColor="gray.200"
-        >
-          <Box borderBottom="solid 1px" borderColor="gray.200" py={2} px={5}>
+        <Card onClick={() => setFlipped(!flipped)} key="back">
+          <CardContent
+            borderBottom="solid 1px"
+            borderColor="gray.200"
+            py={2}
+            px={5}
+          >
             Answer
-          </Box>
-          <Box
+          </CardContent>
+          <CardContent
             borderBottom="solid 1px"
             borderColor="gray.200"
             py={3}
@@ -93,30 +111,32 @@ const Left = () => {
             <Text>
               <Markdown>{curCard.answer}</Markdown>
             </Text>
-          </Box>
-          <ButtonGroup py={2} px={4} size="xs" variant="ghost" spacing={2}>
-            <Button
-              colorScheme="green"
-              onClick={(e) => {
-                e.stopPropagation();
-                dispatch(upgradeCard(curCard));
-                setFlipped(false);
-              }}
-            >
-              Got it!
-            </Button>
-            <Button
-              colorScheme="red"
-              onClick={(e) => {
-                e.stopPropagation();
-                dispatch(resetCard(curCard));
-                setFlipped(false);
-              }}
-            >
-              Incorrect
-            </Button>
-          </ButtonGroup>
-        </Box>
+          </CardContent>
+          <CardContent>
+            <ButtonGroup size="xs" variant="ghost" spacing={2}>
+              <Button
+                colorScheme="green"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  dispatch(upgradeCard(curCard));
+                  setFlipped(false);
+                }}
+              >
+                Got it!
+              </Button>
+              <Button
+                colorScheme="red"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  dispatch(resetCard(curCard));
+                  setFlipped(false);
+                }}
+              >
+                Incorrect
+              </Button>
+            </ButtonGroup>
+          </CardContent>
+        </Card>
       </ReactCardFlip>
     );
   } else {
@@ -149,33 +169,87 @@ const Left = () => {
   }
 };
 
+const EditableMarkdown = ({
+  value,
+  onChange,
+  placeholder,
+}: {
+  onChange: (e: any) => void;
+  value: string;
+  placeholder: string;
+}) => {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  return (
+    <Box>
+      <Textarea
+        ref={textareaRef}
+        onBlur={onClose}
+        value={value}
+        onChange={(e) => onChange(e)}
+        display={!isOpen ? "none" : undefined}
+        placeholder={placeholder}
+      />
+      <Tooltip label="Click me!" hasArrow placement="left">
+        <Text
+          tabIndex={0}
+          onClick={() => {
+            onOpen();
+            setTimeout(() => textareaRef.current?.focus());
+          }}
+          display={isOpen ? "none" : undefined}
+          cursor="pointer"
+          _hover={{
+            textDecoration: "underline",
+          }}
+        >
+          <Markdown>{value || placeholder}</Markdown>
+        </Text>
+      </Tooltip>
+    </Box>
+  );
+};
+
 const Right = () => {
   const dispatch = useAppDispatch();
   const toast = useToast();
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
+  const [reversible, setReversible] = useState(false);
   return (
-    <>
-      <div>
-        <Textarea
+    <Card>
+      <CardContent>
+        <Heading size="sm">Add new card</Heading>
+      </CardContent>
+      <CardContent>
+        <EditableMarkdown
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
-          variant="outline"
           placeholder="Question"
-          w="50%"
         />
-        <Textarea
+        <EditableMarkdown
           value={answer}
           onChange={(e) => setAnswer(e.target.value)}
-          variant="outline"
           placeholder="Answer"
-          w="50%"
         />
-      </div>
-      <div>
+        <Tooltip label="Will be implemented in the future">
+          <Box>
+            Is reversable?
+            <Switch
+              ml={2}
+              isChecked={reversible}
+              onChange={(e) => setReversible(e.target.checked)}
+              isDisabled
+            />
+          </Box>
+        </Tooltip>
+      </CardContent>
+      <CardContent>
         <Button
           colorScheme="blue"
           leftIcon={<AddIcon />}
+          size="sm"
           onClick={() => {
             dispatch(addCard({ question, answer }));
             setQuestion("");
@@ -185,27 +259,27 @@ const Right = () => {
         >
           Submit
         </Button>
-      </div>
-    </>
+      </CardContent>
+    </Card>
   );
 };
 
 const Top = () => {
-  const [focus, setFocus] = useState<"left" | "right">("left");
+  // const [focus, setFocus] = useState<"left" | "right">("left");
   return (
     <Grid gap={8} m="24px" templateColumns="repeat(12, 1fr)">
       <GridItem
-        colSpan={focus === "left" ? 8 : 3}
+        colSpan={7}
         onMouseEnter={() => {
-          setFocus("left");
+          // setFocus("left");
         }}
       >
         <Left />
       </GridItem>
       <GridItem
-        colSpan={focus === "right" ? 9 : 4}
+        colSpan={5}
         onMouseEnter={() => {
-          setFocus("right");
+          // setFocus("right");
         }}
       >
         <Right />
@@ -242,7 +316,6 @@ const Amount = () => {
           style={{
             data: {
               fill: ({ datum }) => {
-                console.log({ datum });
                 switch (datum.x % 5) {
                   case 0:
                     return colors.red[400];
@@ -269,9 +342,9 @@ const Amount = () => {
 const Insights = () => {
   return (
     <SimpleGrid columns={[1, null, 2, 3]} spacing={6} p={7}>
-      <Box boxShadow="lg" p={5}>
+      <Card p={2}>
         <Amount />
-      </Box>
+      </Card>
     </SimpleGrid>
   );
 };
