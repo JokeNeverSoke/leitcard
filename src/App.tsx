@@ -43,9 +43,13 @@ const Card = (props: React.ComponentProps<typeof Box>) => {
   return (
     <Box
       borderRadius="lg"
-      boxShadow="lg"
+      boxShadow="md"
       border="1px"
       borderColor="gray.200"
+      transition="0.2s ease-in-out"
+      _hover={{
+        boxShadow: "lg",
+      }}
       {...props}
     />
   );
