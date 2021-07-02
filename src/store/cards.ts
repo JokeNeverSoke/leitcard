@@ -13,7 +13,7 @@ import {
   findCardByIdFromDB,
 } from "../services/cards";
 import { RootState } from ".";
-import { getEnum, setEnum } from "../services/schedule";
+import { getDate, getEnum, setDate, setEnum } from "../services/schedule";
 
 declare global {
   interface Card {
@@ -48,6 +48,10 @@ const initialState: CardsState = {
 
 const isActive = (card: Card | ActiveCard): card is ActiveCard => {
   return card.status !== "grad";
+};
+
+const isNewDay = (old: dayjs.Dayjs, next: dayjs.Dayjs) => {
+  return old.isBefore(next, "day");
 };
 
 const removeCardFromDeck = <T extends Card | ActiveCard>(
@@ -125,6 +129,24 @@ export const incrementDate = () => {
     const newDate = oldState.cards.currentEnum + 1;
     setEnum(newDate);
     dispatch(changeDate(newDate));
+  };
+};
+
+export const syncDate = () => {
+  return (
+    dispatch: (
+      arg0: (
+        dispatch: (arg0: { payload: number | undefined; type: string }) => void,
+        getState: () => RootState
+      ) => void
+    ) => void
+  ) => {
+    const old = getDate();
+    const next = dayjs();
+    if (isNewDay(old, next)) {
+      dispatch(incrementDate());
+      setDate(next);
+    }
   };
 };
 

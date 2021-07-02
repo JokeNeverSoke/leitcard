@@ -11,11 +11,10 @@ import {
   SimpleGrid,
   useTheme,
   Heading,
-  EditablePreview,
-  useControllableState,
   useDisclosure,
   Tooltip,
   Switch,
+  Center,
 } from "@chakra-ui/react";
 import ReactCardFlip from "react-card-flip";
 import Markdown from "markdown-to-jsx";
@@ -36,8 +35,10 @@ import {
   upgradeCard,
   updatePostToDB,
   syncEnum,
+  syncDate,
 } from "./store/cards";
 import { AddIcon } from "@chakra-ui/icons";
+import { getStatus } from "./utils/findStatuses";
 
 const Card = (props: React.ComponentProps<typeof Box>) => {
   return (
@@ -78,12 +79,6 @@ const Left = () => {
     .concat(currentCards)
     .filter((c) => c.lastEnum < currentEnum);
   const curCard = cards[0];
-  useEffect(() => {
-    [0, 1, 2, 3, 4, 5, 6].forEach((level) => {
-      dispatch(fetchLevelFromDB(level));
-    });
-    dispatch(syncEnum());
-  }, []);
   if (cards.length) {
     return (
       <ReactCardFlip isFlipped={flipped} infinite>
@@ -145,30 +140,26 @@ const Left = () => {
     );
   } else {
     return (
-      <Box>
-        <Box
-          borderRadius="lg"
-          boxShadow="lg"
-          border="1px"
-          borderColor="gray.200"
-          pt={5}
-          pb={4}
-          px={5}
+      <Card pt={5} pb={4} px={5} textAlign="center">
+        <Text>You're all done for today!</Text>
+        <Tooltip
+          hasArrow
+          label="The point of the leitner system is to span repetition over time on 'the sweet spot'"
+          borderRadius="md"
           textAlign="center"
         >
-          <Text>You're all done for today!</Text>
           <Button
             onClick={() => {
               dispatch(incrementDate());
             }}
-            colorScheme="blue"
-            size="sm"
+            color="gray.300"
+            size="xs"
             variant="ghost"
           >
-            Proceed to next day
+            Proceed to next day (not recommended)
           </Button>
-        </Box>
-      </Box>
+        </Tooltip>
+      </Card>
     );
   }
 };
@@ -348,17 +339,57 @@ const Amount = () => {
   );
 };
 
+const Day = () => {
+  const currentEnum = useAppSelector((state) => state.cards.currentEnum);
+  return (
+    <Center h="100%">
+      <Heading>Day {currentEnum}</Heading>
+    </Center>
+  );
+};
+
+const GradCards = () => {
+  const gradCardsCount = useAppSelector((state) => state.cards.grads.length);
+  const status = getStatus(gradCardsCount);
+  return (
+    <Center h="100%" color={status.color}>
+      <Box textAlign="center">
+        <Heading>Cards Graduated: {gradCardsCount}</Heading>
+        <Heading textDecoration="underline" size="md">
+          {status.title}
+        </Heading>
+      </Box>
+    </Center>
+  );
+};
+
 const Insights = () => {
   return (
     <SimpleGrid columns={[1, null, 2, 3]} spacing={6} p={7}>
-      <Card p={2}>
+      <Card p={2} h="sm">
+        <GradCards />
+      </Card>
+      <Card p={2} h="sm">
         <Amount />
+      </Card>
+      <Card p={2} h="sm">
+        <Day />
       </Card>
     </SimpleGrid>
   );
 };
 
 const App = () => {
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    [0, 1, 2, 3, 4, 5, 6].forEach((level) => {
+      dispatch(fetchLevelFromDB(level));
+    });
+    dispatch(syncEnum());
+    dispatch(syncDate());
+  }, []);
+
   return (
     <>
       <Top />
