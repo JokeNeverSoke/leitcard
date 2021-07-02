@@ -15,10 +15,22 @@ import {
   Tooltip,
   Switch,
   Center,
+  Flex,
+  Spacer,
+  IconButton,
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverArrow,
+  PopoverHeader,
+  PopoverCloseButton,
+  PopoverBody,
+  Portal,
 } from "@chakra-ui/react";
 import ReactCardFlip from "react-card-flip";
 import Markdown from "markdown-to-jsx";
 import { VictoryBar, VictoryChart, VictoryAxis, VictoryLabel } from "victory";
+import { FiEdit, FiPlus, FiTrash2 } from "react-icons/fi";
 
 import {
   useAppSelector,
@@ -36,8 +48,8 @@ import {
   updatePostToDB,
   syncEnum,
   syncDate,
+  deleteCard,
 } from "./store/cards";
-import { AddIcon } from "@chakra-ui/icons";
 import { getStatus } from "./utils/findStatuses";
 
 const Card = (props: React.ComponentProps<typeof Box>) => {
@@ -82,23 +94,83 @@ const Left = () => {
   if (cards.length) {
     return (
       <ReactCardFlip isFlipped={flipped} infinite>
-        <Card onClick={() => setFlipped(!flipped)} key="front">
+        <Card key="front">
           <CardContent>{`Level ${curCard.status + 1}`}</CardContent>
-          <CardContent textAlign="center">
+          <CardContent
+            onClick={() => setFlipped(!flipped)}
+            cursor="pointer"
+            textAlign="center"
+          >
             <Text>
               <Markdown>{curCard.question}</Markdown>
             </Text>
           </CardContent>
         </Card>
 
-        <Card onClick={() => setFlipped(!flipped)} key="back">
+        <Card key="back">
           <CardContent
             borderBottom="solid 1px"
             borderColor="gray.200"
             py={2}
             px={5}
           >
-            Answer
+            <Flex>
+              Answer
+              <Spacer />
+              <ButtonGroup
+                isAttached
+                size="xs"
+                borderRadius="md"
+                overflow="hidden"
+                variant="ghost"
+              >
+                <Tooltip hasArrow label="Not implemented yet">
+                  <IconButton
+                    icon={<FiEdit />}
+                    aria-label="Edit"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                  />
+                </Tooltip>
+                <Popover>
+                  {({ onClose }) => (
+                    <>
+                      <PopoverTrigger>
+                        <IconButton
+                          icon={<FiTrash2 />}
+                          aria-label="Delete"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                          }}
+                        />
+                      </PopoverTrigger>
+                      <Portal>
+                        <PopoverContent>
+                          <PopoverArrow />
+                          <PopoverHeader>
+                            Are you sure you want to delete?
+                          </PopoverHeader>
+                          <PopoverCloseButton />
+                          <PopoverBody>
+                            <Button
+                              colorScheme="red"
+                              onClick={() => {
+                                onClose();
+                                dispatch(deleteCard(curCard));
+                                setFlipped(false);
+                              }}
+                            >
+                              Delete
+                            </Button>
+                          </PopoverBody>
+                        </PopoverContent>
+                      </Portal>
+                    </>
+                  )}
+                </Popover>
+              </ButtonGroup>
+            </Flex>
           </CardContent>
           <CardContent
             borderBottom="solid 1px"
@@ -106,6 +178,8 @@ const Left = () => {
             py={3}
             px={5}
             textAlign="center"
+            onClick={() => setFlipped(!flipped)}
+            cursor="pointer"
           >
             <Text>
               <Markdown>{curCard.answer}</Markdown>
@@ -243,7 +317,7 @@ const Right = () => {
       <CardContent>
         <Button
           colorScheme="blue"
-          leftIcon={<AddIcon />}
+          leftIcon={<FiPlus />}
           size="sm"
           onClick={() => {
             dispatch(addCard({ question, answer }));

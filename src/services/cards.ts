@@ -18,6 +18,10 @@ export const getLevelsFromDB = async (level: number) => {
   return cards;
 };
 
+export const deleteCardFromDB = async (card: Card) => {
+  await db.cards.delete(card.id);
+};
+
 export const updatePostFromDB = async (card: Card) => {
   await db.cards.update(card.id, card);
 };

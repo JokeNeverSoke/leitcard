@@ -11,6 +11,7 @@ import {
   getLevelsFromDB,
   updatePostFromDB,
   findCardByIdFromDB,
+  deleteCardFromDB,
 } from "../services/cards";
 import { RootState } from ".";
 import { getDate, getEnum, setDate, setEnum } from "../services/schedule";
@@ -120,6 +121,14 @@ export const addCard = createAsyncThunk(
   }
 );
 
+export const deleteCard = createAsyncThunk(
+  "cards/deleteCard",
+  async (card: ActiveCard | Card) => {
+    await deleteCardFromDB(card);
+    return card;
+  }
+);
+
 export const incrementDate = () => {
   return (
     dispatch: (arg0: { payload: number | undefined; type: string }) => void,
@@ -154,15 +163,6 @@ export const cardsSlice = createSlice({
   name: "cards",
   initialState,
   reducers: {
-    deleteCard: (state, action: PayloadAction<Card>) => {
-      const card = action.payload;
-      if (!isActive(card)) {
-        state.grads.splice(state.grads.indexOf(card));
-      } else {
-        const from = card.status;
-        state.levels[from].splice(state.levels[from].indexOf(card));
-      }
-    },
     resetCard: (state, action: PayloadAction<ActiveCard>) => {
       const card = action.payload;
       const nextLevel = 0;
@@ -254,14 +254,21 @@ export const cardsSlice = createSlice({
       const to = payload.status;
       state.levels[to].push(card);
     });
+    builder.addCase(deleteCard.fulfilled, (state, { payload }) => {
+      const card = payload;
+      if (!isActive(card)) {
+        state.grads = removeCardFromDeck(state.grads, card);
+      } else {
+        const from = card.status;
+        state.levels[from] = removeCardFromDeck(
+          state.levels[card.status],
+          card
+        );
+      }
+    });
   },
 });
 
-export const {
-  deleteCard,
-  refreshSchedule,
-  changeDate,
-  syncEnum,
-} = cardsSlice.actions;
+export const { refreshSchedule, changeDate, syncEnum } = cardsSlice.actions;
 
 export default cardsSlice.reducer;
