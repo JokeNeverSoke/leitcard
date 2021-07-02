@@ -271,9 +271,14 @@ const Right = () => {
 const Top = () => {
   // const [focus, setFocus] = useState<"left" | "right">("left");
   return (
-    <Grid gap={8} m="24px" templateColumns="repeat(12, 1fr)">
+    <Grid
+      rowGap={8}
+      columnGap={[0, null, 8]}
+      m="24px"
+      templateColumns="repeat(12, 1fr)"
+    >
       <GridItem
-        colSpan={7}
+        colSpan={[12, null, 7]}
         onMouseEnter={() => {
           // setFocus("left");
         }}
@@ -281,7 +286,7 @@ const Top = () => {
         <Left />
       </GridItem>
       <GridItem
-        colSpan={5}
+        colSpan={[12, null, 5]}
         onMouseEnter={() => {
           // setFocus("right");
         }}
