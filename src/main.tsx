@@ -2,10 +2,13 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
 import { ChakraProvider } from "@chakra-ui/react";
+import { registerSW } from "virtual:pwa-register";
 
 import "./index.css";
 import { store } from "./store";
 import App from "./App";
+
+registerSW();
 
 ReactDOM.render(
   <React.StrictMode>
