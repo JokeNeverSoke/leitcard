@@ -11,7 +11,7 @@ export const Config = () => {
   return (
     <>
       <Checkbox
-        checked={pref.finishAllFirstLevel}
+        isChecked={pref.finishAllFirstLevel}
         onChange={(e) => {
           dispatch(setPref("finishAllFirstLevel", e.target.checked));
         }}
