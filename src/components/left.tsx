@@ -14,6 +14,7 @@ import {
   PopoverBody,
   Button,
   Text,
+  useBreakpointValue,
 } from "@chakra-ui/react";
 import Markdown from "markdown-to-jsx";
 import React, { useState } from "react";
@@ -40,6 +41,10 @@ export const Left = () => {
   const babyCards = useAppSelector(showCardsInLevel(levels[0]));
   const currentCards = useAppSelector(showCardsInLevel(levels[1]));
   const [flipped, setFlipped] = useState(false);
+  const allDone = useBreakpointValue({
+    base: "Next day",
+    md: "Proceed to next day (not recommended)",
+  });
   const cards = babyCards
     .concat(currentCards)
     .filter((c) => c.lastEnum < currentEnum);
@@ -183,7 +188,7 @@ export const Left = () => {
             size="xs"
             variant="ghost"
           >
-            Proceed to next day (not recommended)
+            {allDone}
           </Button>
         </Tooltip>
       </Card>
