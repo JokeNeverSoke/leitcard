@@ -2,10 +2,11 @@ import React, { useEffect } from "react";
 import { Grid, GridItem } from "@chakra-ui/react";
 
 import { useAppDispatch } from "./store";
-import { fetchLevelFromDB, syncEnum, syncDate } from "./store/cards";
+import { fetchLevelFromDB, syncEnum, syncDate, syncPref } from "./store/cards";
 import { Insights } from "./components/insights";
 import { Left } from "./components/left";
 import { Right } from "./components/right";
+import { Navbar } from "./components/navbar";
 
 const Top = () => {
   // const [focus, setFocus] = useState<"left" | "right">("left");
@@ -45,10 +46,12 @@ const App = () => {
     });
     dispatch(syncEnum());
     dispatch(syncDate());
+    dispatch(syncPref());
   }, []);
 
   return (
     <>
+      <Navbar />
       <Top />
 
       <Insights />

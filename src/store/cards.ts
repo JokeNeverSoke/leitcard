@@ -15,6 +15,7 @@ import {
 } from "../services/cards";
 import { RootState } from ".";
 import { getDate, getEnum, setDate, setEnum } from "../services/schedule";
+import { getPreference, setPreference } from "../services/preferences";
 
 declare global {
   interface Card {
@@ -31,6 +32,11 @@ declare global {
   }
 
   type Schedule = Array<[number, number]>;
+
+  interface Preference {
+    /** Keep level 1 on today if forgotten */
+    finishAllFirstLevel: boolean;
+  }
 }
 
 interface CardsState {
@@ -38,6 +44,7 @@ interface CardsState {
   grads: Card[];
   currentEnum: number;
   schedule: Schedule;
+  preference: Preference;
 }
 
 const initialState: CardsState = {
@@ -45,6 +52,9 @@ const initialState: CardsState = {
   grads: [],
   currentEnum: 0,
   schedule: generateSchedule(),
+  preference: {
+    finishAllFirstLevel: true,
+  },
 };
 
 const isActive = (card: Card | ActiveCard): card is ActiveCard => {
@@ -88,7 +98,12 @@ export const resetCard = createAsyncThunk(
     const state = getState() as RootState;
     const nextLevel = 0;
 
-    const currentEnum = state.cards.currentEnum;
+    let currentEnum: number;
+    if (state.cards.preference.finishAllFirstLevel) {
+      currentEnum = card.lastEnum;
+    } else {
+      currentEnum = state.cards.currentEnum;
+    }
     dispatch(
       updatePostToDB({ ...card, status: nextLevel, lastEnum: currentEnum })
     );
@@ -231,6 +246,28 @@ export const cardsSlice = createSlice({
         return { payload: currentEnum };
       },
     },
+    syncPref: {
+      reducer(state, { payload }: PayloadAction<Preference>) {
+        state.preference = payload;
+      },
+      prepare() {
+        const pref = getPreference() as Preference;
+        return { payload: pref };
+      },
+    },
+    setPref: {
+      reducer(
+        state,
+        { payload }: PayloadAction<{ key: keyof Preference; value: any }>
+      ) {
+        const { key, value } = payload;
+        state.preference[key] = value;
+      },
+      prepare(key: keyof Preference, value: any) {
+        setPreference(key, value);
+        return { payload: { key, value } };
+      },
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchLevelFromDB.fulfilled, (state, { payload }) => {
@@ -269,6 +306,12 @@ export const cardsSlice = createSlice({
   },
 });
 
-export const { refreshSchedule, changeDate, syncEnum } = cardsSlice.actions;
+export const {
+  refreshSchedule,
+  changeDate,
+  syncEnum,
+  syncPref,
+  setPref,
+} = cardsSlice.actions;
 
 export default cardsSlice.reducer;
