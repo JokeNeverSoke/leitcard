@@ -59,7 +59,7 @@ export const Navbar = () => {
 
           <DrawerFooter>
             <Button variant="outline" onClick={onClose}>
-              Cancel
+              Close
             </Button>
           </DrawerFooter>
         </DrawerContent>

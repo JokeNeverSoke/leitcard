@@ -2457,6 +2457,11 @@ detect-node-es@^1.1.0:
   resolved "https://registry.npm.taobao.org/detect-node-es/download/detect-node-es-1.1.0.tgz?cache=0&sync_timestamp=1616030315514&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fdetect-node-es%2Fdownload%2Fdetect-node-es-1.1.0.tgz#163acdf643330caa0b4cd7c21e7ee7755d6fa493"
   integrity sha1-FjrN9kMzDKoLTNfCHn7ndV1vpJM=
 
+dexie-export-import@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.nlark.com/dexie-export-import/download/dexie-export-import-1.0.3.tgz#e93926a0a3939c68f5e2b80b48517ea4c6d88fde"
+  integrity sha1-6TkmoKOTnGj14rgLSFF+pMbYj94=
+
 dexie@^3.0.3:
   version "3.0.3"
   resolved "https://registry.nlark.com/dexie/download/dexie-3.0.3.tgz#ede63849dfe5f07e13e99bb72a040e8ac1d29dab"
