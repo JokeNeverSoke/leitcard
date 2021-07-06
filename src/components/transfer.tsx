@@ -12,21 +12,24 @@ import {
   Alert,
   AlertIcon,
   Textarea,
+  useToast,
 } from "@chakra-ui/react";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { exportCurrent, importCurrent } from "../db";
 
 export const Transfer = () => {
-  const [loading, setLoading] = useState(false);
+  const toast = useToast();
   const [isLoad, setIsLoad] = useState(false);
   const [saveString, setSaveString] = useState("loading");
-  const [shouldCopy, setShouldCopy] = useState(false);
+  const [shouldCopy, setShouldCopy] = useState(0);
   const [code, setCode] = useState("");
   const { onCopy } = useClipboard(saveString);
-  if (shouldCopy) {
-    setShouldCopy(false);
+  useEffect(() => {
+    if (shouldCopy === 0) return;
+    toast({ title: "Copied to clipboard!", status: "success" });
     onCopy();
-  }
+  }, [shouldCopy]);
+
   return (
     <>
       <Modal isOpen={isLoad} onClose={() => setIsLoad(false)}>
@@ -71,7 +74,7 @@ export const Transfer = () => {
           onClick={() => {
             exportCurrent().then((s) => {
               setSaveString(s);
-              setShouldCopy(true);
+              setShouldCopy((s) => s + 1);
             });
           }}
         >
