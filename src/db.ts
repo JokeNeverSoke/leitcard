@@ -27,10 +27,28 @@ interface FinalExport {
   pref: Preference;
 }
 
+function b64EncodeUnicode(str: string) {
+  return btoa(
+    encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, function (match, p1) {
+      return String.fromCharCode(parseInt(p1, 16));
+    })
+  );
+}
+
+function b64DecodeUnicode(str: string) {
+  return decodeURIComponent(
+    Array.prototype.map
+      .call(atob(str), function (c) {
+        return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+      })
+      .join("")
+  );
+}
+
 export const exportCurrent = async () => {
   const dbP = exportDB(db)
     .then((blob) => blob.text())
-    .then((text) => btoa(text));
+    .then((text) => b64EncodeUnicode(text));
   const currentDate = getDate();
   const currentEnum = getEnum();
   const currentPref = getPreference() as Preference;
@@ -41,16 +59,16 @@ export const exportCurrent = async () => {
     enum: currentEnum,
     pref: currentPref,
   };
-  return btoa(JSON.stringify(final));
+  return b64EncodeUnicode(JSON.stringify(final));
 };
 
 export const importCurrent = async (v: string) => {
-  const i = JSON.parse(atob(v)) as FinalExport;
+  const i = JSON.parse(b64DecodeUnicode(v)) as FinalExport;
   const currentDate = dayjs(i.date);
   const currentEnum = i.enum;
   const currentPref = i.pref;
   const k = db.cards.clear().then(async () => {
-    const dbJson = atob(i.db);
+    const dbJson = b64DecodeUnicode(i.db);
     await importInto(db, new Blob([dbJson]));
   });
   setPreference(currentPref);
