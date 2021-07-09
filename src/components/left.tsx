@@ -45,8 +45,8 @@ export const Left = () => {
     base: "Next day",
     md: "Proceed to next day (not recommended)",
   });
-  const cards = babyCards
-    .concat(currentCards)
+  const cards = currentCards
+    .concat(babyCards)
     .filter((c) => c.lastEnum < currentEnum);
   const curCard = cards[0];
   if (cards.length) {
