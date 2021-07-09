@@ -15,6 +15,7 @@ import {
   Button,
   Text,
   useBreakpointValue,
+  Fade,
 } from "@chakra-ui/react";
 import Markdown from "markdown-to-jsx";
 import React, { useState } from "react";
@@ -139,9 +140,11 @@ export const Left = () => {
             onClick={() => setFlipped(!flipped)}
             cursor="pointer"
           >
-            <Text>
-              <Markdown>{curCard.answer}</Markdown>
-            </Text>
+            <Fade key={curCard.id} in={flipped} transition={{}}>
+              <Text>
+                <Markdown>{curCard.answer}</Markdown>
+              </Text>
+            </Fade>
           </CardContent>
           <CardContent>
             <ButtonGroup size="xs" variant="ghost" spacing={2}>
