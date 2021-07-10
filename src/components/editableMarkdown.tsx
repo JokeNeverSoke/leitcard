@@ -1,45 +1,91 @@
-import { Box, Textarea, Tooltip, Text, useDisclosure } from "@chakra-ui/react";
+import {
+  Box,
+  Textarea,
+  Tooltip,
+  Text,
+  useDisclosure,
+  FormControl,
+  FormLabel,
+} from "@chakra-ui/react";
 import Markdown from "markdown-to-jsx";
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 
 export const EditableMarkdown = ({
   value,
   onChange,
-  placeholder,
+  label,
+  onSubmit,
+  isFocused,
+  onOpen: onO,
+  onClose: onC,
 }: {
   onChange: (e: any) => void;
   value: string;
-  placeholder: string;
+  label: string;
+  onSubmit?: () => void;
+  isFocused?: boolean;
+  onOpen?: () => void;
+  onClose?: () => void;
 }) => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen, onOpen, onClose } = useDisclosure({
+    isOpen: isFocused,
+    onOpen: onO,
+    onClose: onC,
+  });
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const commonStyleProps = {
+    px: 2,
+    py: 0.5,
+    background: "gray.50",
+    borderRadius: "md",
+    transition: '0.3s ease-in-out'
+  };
+  useEffect(() => {
+    if (isOpen) {
+      textareaRef.current?.focus();
+    }
+  }, [isOpen]);
 
   return (
-    <Box>
+    <FormControl pb={3}>
+      {label && (
+        <FormLabel fontSize="xs" color="gray.500" mb={0} ml={0.5}>
+          {label}
+        </FormLabel>
+      )}
       <Textarea
         ref={textareaRef}
         onBlur={onClose}
+        onFocus={onOpen}
         value={value}
         onChange={(e) => onChange(e)}
-        display={!isOpen ? "none" : undefined}
-        placeholder={placeholder}
+        rows={2}
+        display={!isOpen && value ? "none" : undefined}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" && e.shiftKey) {
+            e.preventDefault();
+            textareaRef.current?.blur();
+            onSubmit && onSubmit();
+          }
+        }}
+        {...commonStyleProps}
       />
-      <Tooltip label="Click me!" hasArrow placement="left">
-        <Text
-          tabIndex={0}
-          onClick={() => {
-            onOpen();
-            setTimeout(() => textareaRef.current?.focus());
-          }}
-          display={isOpen ? "none" : undefined}
-          cursor="pointer"
-          _hover={{
-            textDecoration: "underline",
-          }}
-        >
-          <Markdown>{value || placeholder}</Markdown>
-        </Text>
-      </Tooltip>
-    </Box>
+      <Text
+        tabIndex={0}
+        onClick={() => {
+          onOpen();
+        }}
+        {...commonStyleProps}
+        display={isOpen || !value ? "none" : undefined}
+        cursor="pointer"
+        _hover={{
+          textDecoration: "underline",
+          background: "gray.100",
+        }}
+        as="div"
+      >
+        <Markdown>{value || ""}</Markdown>
+      </Text>
+    </FormControl>
   );
 };

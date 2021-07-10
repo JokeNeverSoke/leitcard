@@ -19,6 +19,23 @@ export const Right = () => {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [reversible, setReversible] = useState(false);
+  const [isAnswerFocus, setIsAnswerFocus] = useState(false);
+
+  const onSubmit = () => {
+    if (!question) {
+      toast({ title: "Question can't be empty", status: "warning" });
+      return;
+    }
+    if (!answer) {
+      toast({ title: "Answer can't be empty", status: "warning" });
+      return;
+    }
+    dispatch(addCard({ question, answer }));
+    setQuestion("");
+    setAnswer("");
+    toast({ title: "Card added!", status: "success" });
+  };
+
   return (
     <Card>
       <CardContent>
@@ -28,12 +45,19 @@ export const Right = () => {
         <EditableMarkdown
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
-          placeholder="Question"
+          label="Question"
+          onSubmit={() => {
+            setIsAnswerFocus(true);
+          }}
         />
         <EditableMarkdown
           value={answer}
           onChange={(e) => setAnswer(e.target.value)}
-          placeholder="Answer"
+          label="Answer"
+          isFocused={isAnswerFocus}
+          onOpen={() => setIsAnswerFocus(true)}
+          onClose={() => setIsAnswerFocus(false)}
+          onSubmit={onSubmit}
         />
         <Tooltip label="Will be implemented in the future">
           <Box>
@@ -52,12 +76,7 @@ export const Right = () => {
           colorScheme="blue"
           leftIcon={<FiPlus />}
           size="sm"
-          onClick={() => {
-            dispatch(addCard({ question, answer }));
-            setQuestion("");
-            setAnswer("");
-            toast({ title: "Card added!", status: "success" });
-          }}
+          onClick={onSubmit}
         >
           Submit
         </Button>

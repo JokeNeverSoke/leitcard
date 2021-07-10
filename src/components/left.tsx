@@ -60,7 +60,7 @@ export const Left = () => {
             cursor="pointer"
             textAlign="center"
           >
-            <Text>
+            <Text as="div">
               <Markdown>{curCard.question}</Markdown>
             </Text>
           </CardContent>
