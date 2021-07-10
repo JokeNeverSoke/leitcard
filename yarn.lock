@@ -1709,6 +1709,81 @@
     estree-walker "^2.0.1"
     picomatch "^2.2.2"
 
+"@sentry/browser@6.8.0":
+  version "6.8.0"
+  resolved "https://registry.nlark.com/@sentry/browser/download/@sentry/browser-6.8.0.tgz?cache=0&sync_timestamp=1624876063546&other_urls=https%3A%2F%2Fregistry.nlark.com%2F%40sentry%2Fbrowser%2Fdownload%2F%40sentry%2Fbrowser-6.8.0.tgz#023707cd2302f6818014e9a7e124856b2d064178"
+  integrity sha1-AjcHzSMC9oGAFOmn4SSFay0GQXg=
+  dependencies:
+    "@sentry/core" "6.8.0"
+    "@sentry/types" "6.8.0"
+    "@sentry/utils" "6.8.0"
+    tslib "^1.9.3"
+
+"@sentry/core@6.8.0":
+  version "6.8.0"
+  resolved "https://registry.nlark.com/@sentry/core/download/@sentry/core-6.8.0.tgz?cache=0&sync_timestamp=1624876057853&other_urls=https%3A%2F%2Fregistry.nlark.com%2F%40sentry%2Fcore%2Fdownload%2F%40sentry%2Fcore-6.8.0.tgz#bfac76844deee9126460c18dc6166015992efdc3"
+  integrity sha1-v6x2hE3u6RJkYMGNxhZgFZku/cM=
+  dependencies:
+    "@sentry/hub" "6.8.0"
+    "@sentry/minimal" "6.8.0"
+    "@sentry/types" "6.8.0"
+    "@sentry/utils" "6.8.0"
+    tslib "^1.9.3"
+
+"@sentry/hub@6.8.0":
+  version "6.8.0"
+  resolved "https://registry.nlark.com/@sentry/hub/download/@sentry/hub-6.8.0.tgz?cache=0&sync_timestamp=1624876060202&other_urls=https%3A%2F%2Fregistry.nlark.com%2F%40sentry%2Fhub%2Fdownload%2F%40sentry%2Fhub-6.8.0.tgz#cb0f8509093919ed3c1ef98ef8cf63dc102a6524"
+  integrity sha1-yw+FCQk5Ge08HvmO+M9j3BAqZSQ=
+  dependencies:
+    "@sentry/types" "6.8.0"
+    "@sentry/utils" "6.8.0"
+    tslib "^1.9.3"
+
+"@sentry/minimal@6.8.0":
+  version "6.8.0"
+  resolved "https://registry.nlark.com/@sentry/minimal/download/@sentry/minimal-6.8.0.tgz?cache=0&sync_timestamp=1624876061493&other_urls=https%3A%2F%2Fregistry.nlark.com%2F%40sentry%2Fminimal%2Fdownload%2F%40sentry%2Fminimal-6.8.0.tgz#d6c3e4c96f231367aeb2b8a87a83b53d28e7c6db"
+  integrity sha1-1sPkyW8jE2eusrioeoO1PSjnxts=
+  dependencies:
+    "@sentry/hub" "6.8.0"
+    "@sentry/types" "6.8.0"
+    tslib "^1.9.3"
+
+"@sentry/react@^6.8.0":
+  version "6.8.0"
+  resolved "https://registry.nlark.com/@sentry/react/download/@sentry/react-6.8.0.tgz#3cf4a2e1ef042ee227836e268e702e9cb3b67e41"
+  integrity sha1-PPSi4e8ELuIng24mjnAunLO2fkE=
+  dependencies:
+    "@sentry/browser" "6.8.0"
+    "@sentry/minimal" "6.8.0"
+    "@sentry/types" "6.8.0"
+    "@sentry/utils" "6.8.0"
+    hoist-non-react-statics "^3.3.2"
+    tslib "^1.9.3"
+
+"@sentry/tracing@^6.8.0":
+  version "6.8.0"
+  resolved "https://registry.nlark.com/@sentry/tracing/download/@sentry/tracing-6.8.0.tgz?cache=0&sync_timestamp=1624876062886&other_urls=https%3A%2F%2Fregistry.nlark.com%2F%40sentry%2Ftracing%2Fdownload%2F%40sentry%2Ftracing-6.8.0.tgz#5baa4f2e66cd2e6851c213213017850f67e65f4b"
+  integrity sha1-W6pPLmbNLmhRwhMhMBeFD2fmX0s=
+  dependencies:
+    "@sentry/hub" "6.8.0"
+    "@sentry/minimal" "6.8.0"
+    "@sentry/types" "6.8.0"
+    "@sentry/utils" "6.8.0"
+    tslib "^1.9.3"
+
+"@sentry/types@6.8.0":
+  version "6.8.0"
+  resolved "https://registry.nlark.com/@sentry/types/download/@sentry/types-6.8.0.tgz?cache=0&sync_timestamp=1624876062214&other_urls=https%3A%2F%2Fregistry.nlark.com%2F%40sentry%2Ftypes%2Fdownload%2F%40sentry%2Ftypes-6.8.0.tgz#97fd531a0ed1e75e65b4a24b26509fb7c15eb7b8"
+  integrity sha1-l/1TGg7R515ltKJLJlCft8Fet7g=
+
+"@sentry/utils@6.8.0":
+  version "6.8.0"
+  resolved "https://registry.nlark.com/@sentry/utils/download/@sentry/utils-6.8.0.tgz?cache=0&sync_timestamp=1624876059412&other_urls=https%3A%2F%2Fregistry.nlark.com%2F%40sentry%2Futils%2Fdownload%2F%40sentry%2Futils-6.8.0.tgz#0ffafa5b69fe0cdeabad5c4a6cc68a426eaa6b37"
+  integrity sha1-D/r6W2n+DN6rrVxKbMaKQm6qazc=
+  dependencies:
+    "@sentry/types" "6.8.0"
+    tslib "^1.9.3"
+
 "@surma/rollup-plugin-off-main-thread@^1.4.1":
   version "1.4.2"
   resolved "https://registry.nlark.com/@surma/rollup-plugin-off-main-thread/download/@surma/rollup-plugin-off-main-thread-1.4.2.tgz?cache=0&sync_timestamp=1621527269616&other_urls=https%3A%2F%2Fregistry.nlark.com%2F%40surma%2Frollup-plugin-off-main-thread%2Fdownload%2F%40surma%2Frollup-plugin-off-main-thread-1.4.2.tgz#e6786b6af5799f82f7ab3a82e53f6182d2b91a58"
