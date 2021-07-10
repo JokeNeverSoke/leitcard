@@ -1,12 +1,18 @@
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 import { configureStore, nanoid, Store } from "@reduxjs/toolkit";
+import * as Sentry from "@sentry/react";
 
 import cards, { addCard } from "./cards";
+
+const sentryReduxEnhancer = Sentry.createReduxEnhancer({
+  // Optionally pass options listed below
+});
 
 export const store = configureStore({
   reducer: {
     cards,
   },
+  enhancers: [sentryReduxEnhancer],
 });
 
 export type RootState = ReturnType<typeof store.getState>;

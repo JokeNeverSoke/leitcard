@@ -6,12 +6,6 @@ import * as Sentry from "@sentry/react";
 import { Integrations } from "@sentry/tracing";
 import { registerSW } from "virtual:pwa-register";
 
-import "./index.css";
-import { store } from "./store";
-import App from "./App";
-
-registerSW();
-
 Sentry.init({
   dsn:
     "https://4c2b2dd8c6444efe83c6a289968fb5c0@o576762.ingest.sentry.io/5858154",
@@ -22,6 +16,12 @@ Sentry.init({
   // We recommend adjusting this value in production
   tracesSampleRate: 1.0,
 });
+
+import "./index.css";
+import { store } from "./store";
+import App from "./App";
+
+registerSW();
 
 ReactDOM.render(
   <React.StrictMode>
