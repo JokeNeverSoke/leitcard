@@ -49,14 +49,6 @@ export const Config = () => {
         </Tooltip>
       </Checkbox>
       <Transfer />
-      <Button
-        colorScheme="red"
-        onClick={() => {
-          throw new TypeError("This is a test");
-        }}
-      >
-        Sentry error tracking test
-      </Button>
     </VStack>
   );
 };
