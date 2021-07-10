@@ -4,12 +4,13 @@ import { Provider } from "react-redux";
 import { ChakraProvider } from "@chakra-ui/react";
 import * as Sentry from "@sentry/react";
 import { Integrations } from "@sentry/tracing";
+import { Offline } from "@sentry/integrations";
 import { registerSW } from "virtual:pwa-register";
 
 Sentry.init({
   dsn:
     "https://4c2b2dd8c6444efe83c6a289968fb5c0@o576762.ingest.sentry.io/5858154",
-  integrations: [new Integrations.BrowserTracing()],
+  integrations: [new Integrations.BrowserTracing(), new Offline()],
 
   // Set tracesSampleRate to 1.0 to capture 100%
   // of transactions for performance monitoring.
