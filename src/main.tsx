@@ -11,7 +11,7 @@ Sentry.init({
   dsn:
     "https://4c2b2dd8c6444efe83c6a289968fb5c0@o576762.ingest.sentry.io/5858154",
   integrations: [new Integrations.BrowserTracing(), new Offline()],
-
+  release: process.env.COMMIT_SHA,
   // Set tracesSampleRate to 1.0 to capture 100%
   // of transactions for performance monitoring.
   // We recommend adjusting this value in production

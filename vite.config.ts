@@ -1,3 +1,4 @@
+import fs from "fs";
 import { defineConfig } from "vite";
 import reactRefresh from "@vitejs/plugin-react-refresh";
 import { VitePWA } from "vite-plugin-pwa";
@@ -7,6 +8,18 @@ import viteSentry from "vite-plugin-sentry";
 
 const isDev = () => {
   return process.env.NODE_ENV === "development";
+};
+
+const getSHA = () => {
+  const rev = fs.readFileSync(".git/HEAD").toString().trim();
+  if (rev.indexOf(":") === -1) {
+    return rev;
+  } else {
+    return fs
+      .readFileSync(".git/" + rev.substring(5))
+      .toString()
+      .trim();
+  }
 };
 
 const sentryConfig: ViteSentryPluginOptions = {
@@ -55,5 +68,8 @@ export default defineConfig({
   ],
   build: {
     sourcemap: true,
+  },
+  define: {
+    "process.env.COMMIT_SHA": `"${getSHA()}"`,
   },
 });
