@@ -24,7 +24,7 @@ import ReactCardFlip from "react-card-flip";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
 import {
   selectTodayLevel,
-  showCardsInLevel,
+  selectCardsInLevel,
   useAppDispatch,
   useAppSelector,
 } from "../store";
@@ -43,8 +43,8 @@ export const Left = () => {
   const levels = useAppSelector(selectTodayLevel);
   const toast = useToast();
   const currentEnum = useAppSelector((state) => state.cards.currentEnum);
-  const babyCards = useAppSelector(showCardsInLevel(levels[0]));
-  const currentCards = useAppSelector(showCardsInLevel(levels[1]));
+  const babyCards = useAppSelector(selectCardsInLevel(levels[0]));
+  const currentCards = useAppSelector(selectCardsInLevel(levels[1]));
   const [flipped, setFlipped] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const allDone = useBreakpointValue({

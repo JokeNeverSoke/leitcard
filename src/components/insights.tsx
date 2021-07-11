@@ -6,18 +6,87 @@ import {
   textDecoration,
   useTheme,
   Box,
+  Text,
+  Progress,
 } from "@chakra-ui/react";
 import React from "react";
 import { VictoryAxis, VictoryBar, VictoryChart, VictoryLabel } from "victory";
-import { selectAllLevels, useAppSelector } from "../store";
+import {
+  selectAllLevels,
+  selectCardsCompletedToday,
+  selectTodayLevel,
+  selectTodoCards,
+  useAppSelector,
+} from "../store";
 import { getStatus } from "../utils/findStatuses";
 import { Card } from "./cards";
 
+const Stat: React.FC<{ label: string; progress?: number }> = ({
+  label,
+  children,
+  progress,
+}) => {
+  const hasProgress = typeof progress === "number";
+  return (
+    <Box mb={2} minW={32}>
+      <Box fontSize="xs" color="gray.700" mb={hasProgress ? undefined : -1}>
+        {label}
+      </Box>
+      {hasProgress ? (
+        <Box position="relative">
+          <Box
+            zIndex={10}
+            color="white"
+            position="relative"
+            fontSize="2xl"
+            textAlign="center"
+          >
+            {children}
+          </Box>
+          <Progress
+            h="100%"
+            w="full"
+            position="absolute"
+            top="0"
+            background="blue.100"
+            borderRadius="md"
+            sx={{
+              "& div": {
+                transition: "width 1s ease-in-out",
+              },
+            }}
+            value={progress}
+          />
+        </Box>
+      ) : (
+        <Box fontSize="2xl">{children}</Box>
+      )}
+    </Box>
+  );
+};
+
 const Day = () => {
   const currentEnum = useAppSelector((state) => state.cards.currentEnum);
+  const levels = useAppSelector(selectTodayLevel);
+  const todoCards = useAppSelector(selectTodoCards);
+  const cardsDoneToday = useAppSelector(selectCardsCompletedToday);
+  const cardsLeft = todoCards.length;
+  const cardsFromToday = cardsLeft + cardsDoneToday.length;
+  console.log({ cardsDoneToday, todoCards });
   return (
     <Center h="100%">
-      <Heading>Day {currentEnum}</Heading>
+      <Box>
+        <Stat label="Day">{currentEnum}</Stat>
+        <Stat label="Today's Levels">
+          {`${levels[0] + 1}, ${levels[1] + 1}`}
+        </Stat>
+        <Stat
+          label="Progress"
+          progress={100 - (cardsLeft / cardsFromToday) * 100}
+        >
+          {`${cardsFromToday - cardsLeft}/${cardsFromToday}`}
+        </Stat>
+      </Box>
     </Center>
   );
 };
@@ -87,18 +156,24 @@ const Amount = () => {
   );
 };
 
+const InsightCard: React.FC = ({ children }) => (
+  <Card p={2} h="sm">
+    {children}
+  </Card>
+);
+
 export const Insights = () => {
   return (
     <SimpleGrid columns={[1, null, 2, 3]} spacing={6} p={7}>
-      <Card p={2} h="sm">
-        <GradCards />
-      </Card>
-      <Card p={2} h="sm">
-        <Amount />
-      </Card>
-      <Card p={2} h="sm">
+      <InsightCard>
         <Day />
-      </Card>
+      </InsightCard>
+      <InsightCard>
+        <GradCards />
+      </InsightCard>
+      <InsightCard>
+        <Amount />
+      </InsightCard>
     </SimpleGrid>
   );
 };
