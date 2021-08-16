@@ -5,6 +5,7 @@ import {
   Checkbox,
   Flex,
   IconButton,
+  Text,
   StackDivider,
   Tooltip,
   useDisclosure,
@@ -24,7 +25,14 @@ export const Config = () => {
 
   return (
     <VStack spacing={2} align="left">
-      <Button onClick={() => addBackup().then(console.log)}>Yay</Button>
+      <Checkbox
+        isChecked={pref.autoSave}
+        onChange={(e) => {
+          dispatch(setPref("autoSave", e.target.checked));
+        }}
+      >
+        Autosave
+      </Checkbox>
       <Checkbox
         isChecked={pref.finishAllFirstLevel}
         onChange={(e) => {
@@ -51,6 +59,12 @@ export const Config = () => {
         </Tooltip>
       </Checkbox>
       <Transfer />
+      {!process.env.VITE_VERCEL_ENV ? null : (
+        <Text color="gray.500">
+          {process.env.VITE_VERCEL_GIT_COMMIT_SHA?.slice(0, 8)} -{" "}
+          {process.env.VITE_VERCEL_GIT_COMMIT_MESSAGE}
+        </Text>
+      )}
     </VStack>
   );
 };
