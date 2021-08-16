@@ -13,6 +13,7 @@ import {
 import React from "react";
 import { useState } from "react";
 import { FiHelpCircle } from "react-icons/fi";
+import { addBackup } from "../services/storage";
 import { useAppDispatch, useAppSelector } from "../store";
 import { setPref } from "../store/cards";
 import { Transfer } from "./transfer";
@@ -23,6 +24,7 @@ export const Config = () => {
 
   return (
     <VStack spacing={2} align="left">
+      <Button onClick={() => addBackup().then(console.log)}>Yay</Button>
       <Checkbox
         isChecked={pref.finishAllFirstLevel}
         onChange={(e) => {

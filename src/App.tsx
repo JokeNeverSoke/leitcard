@@ -7,6 +7,7 @@ import { Insights } from "./components/insights";
 import { Left } from "./components/left";
 import { Right } from "./components/right";
 import { Navbar } from "./components/navbar";
+import { backupWorker } from "./services/storage";
 
 const Top = () => {
   // const [focus, setFocus] = useState<"left" | "right">("left");
@@ -47,6 +48,7 @@ const App = () => {
     dispatch(syncEnum());
     dispatch(syncDate());
     dispatch(syncPref());
+    setInterval(backupWorker, 15 * 1000);
   }, []);
 
   return (

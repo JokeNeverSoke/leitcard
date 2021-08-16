@@ -16,6 +16,7 @@ import {
 import { RootState } from ".";
 import { getDate, getEnum, setDate, setEnum } from "../services/schedule";
 import { getPreference, setPreference } from "../services/preferences";
+import { WritableDraft } from "immer/dist/internal";
 
 declare global {
   interface Card {
@@ -36,6 +37,8 @@ declare global {
   interface Preference {
     /** Keep level 1 on today if forgotten */
     finishAllFirstLevel: boolean;
+    autoSave: boolean;
+    saveUri: string | null;
   }
 }
 
@@ -54,6 +57,8 @@ const initialState: CardsState = {
   schedule: generateSchedule(),
   preference: {
     finishAllFirstLevel: true,
+    autoSave: true,
+    saveUri: null,
   },
 };
 
@@ -252,16 +257,27 @@ export const cardsSlice = createSlice({
       },
       prepare() {
         const pref = getPreference() as Preference;
-        return { payload: pref };
+        const npref = { ...initialState.preference, ...pref };
+        setPreference(npref);
+        return { payload: npref };
       },
     },
     setPref: {
-      reducer(
-        state,
-        { payload }: PayloadAction<{ key: keyof Preference; value: any }>
+      reducer<T extends keyof Preference>(
+        state: WritableDraft<CardsState>, // Generics overwrite the state definition for some reason
+        { payload }: PayloadAction<{ key: T; value: Preference[T] }>
       ) {
         const { key, value } = payload;
-        state.preference[key] = value;
+        if (key === "autoSave" && typeof value === "boolean") {
+          state.preference.autoSave = value;
+        } else if (
+          key === "finishAllFirstLevel" &&
+          typeof value === "boolean"
+        ) {
+          state.preference.finishAllFirstLevel = value;
+        } else if (key === "saveUri" && typeof value === "string") {
+          state.preference.saveUri = value;
+        }
       },
       prepare(key: keyof Preference, value: any) {
         setPreference(key, value);

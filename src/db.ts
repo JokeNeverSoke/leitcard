@@ -20,11 +20,13 @@ class LeitcardDatabase extends Dexie {
 
 export const db = new LeitcardDatabase();
 
-interface FinalExport {
-  db: string;
-  date: string;
-  enum: number;
-  pref: Preference;
+declare global {
+  interface FinalExport {
+    db: string;
+    date: string;
+    enum: number;
+    pref: Preference;
+  }
 }
 
 function b64EncodeUnicode(str: string) {
@@ -45,7 +47,7 @@ function b64DecodeUnicode(str: string) {
   );
 }
 
-export const exportCurrent = async () => {
+export const getAllData = async () => {
   const dbP = exportDB(db)
     .then((blob) => blob.text())
     .then((text) => b64EncodeUnicode(text));
@@ -59,20 +61,29 @@ export const exportCurrent = async () => {
     enum: currentEnum,
     pref: currentPref,
   };
+  return final;
+};
+
+export const exportCurrent = async () => {
+  const final = await getAllData();
   return b64EncodeUnicode(JSON.stringify(final));
 };
 
-export const importCurrent = async (v: string) => {
-  const i = JSON.parse(b64DecodeUnicode(v)) as FinalExport;
-  const currentDate = dayjs(i.date);
-  const currentEnum = i.enum;
-  const currentPref = i.pref;
+export const saveAllData = async (data: FinalExport) => {
+  const currentDate = dayjs(data.date);
+  const currentEnum = data.enum;
+  const currentPref = data.pref;
   const k = db.cards.clear().then(async () => {
-    const dbJson = b64DecodeUnicode(i.db);
+    const dbJson = b64DecodeUnicode(data.db);
     await importInto(db, new Blob([dbJson]));
   });
   setPreference(currentPref);
   setEnum(currentEnum);
   setDate(currentDate);
   window.location.reload();
+};
+
+export const importCurrent = async (v: string) => {
+  const i = JSON.parse(b64DecodeUnicode(v)) as FinalExport;
+  await saveAllData(i);
 };
