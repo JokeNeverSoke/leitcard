@@ -120,3 +120,5 @@ dist
 cypress/videos
 cypress/screenshots
 .vscode
+
+.vercel

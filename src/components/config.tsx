@@ -22,6 +22,7 @@ import { Transfer } from "./transfer";
 export const Config = () => {
   const dispatch = useAppDispatch();
   const pref = useAppSelector((state) => state.cards.preference);
+  console.log({ env: import.meta.env, tenv: process.env });
 
   return (
     <VStack spacing={2} align="left">
@@ -59,10 +60,10 @@ export const Config = () => {
         </Tooltip>
       </Checkbox>
       <Transfer />
-      {!process.env.VITE_VERCEL_ENV ? null : (
+      {!import.meta.env.VERCEL ? null : (
         <Text color="gray.500">
-          {process.env.VITE_VERCEL_GIT_COMMIT_SHA?.slice(0, 8)} -{" "}
-          {process.env.VITE_VERCEL_GIT_COMMIT_MESSAGE}
+          {(import.meta.env.VITE_VERCEL_GIT_COMMIT_SHA as string).slice(0, 8)} -{" "}
+          {import.meta.env.VITE_VERCEL_GIT_COMMIT_MESSAGE}
         </Text>
       )}
     </VStack>
