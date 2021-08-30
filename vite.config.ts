@@ -64,12 +64,14 @@ export default defineConfig({
       },
       workbox: {},
     }),
-    !isDev() && viteSentry(sentryConfig),
+    !isDev() && process.env.VERCEL && viteSentry(sentryConfig),
   ],
   build: {
     sourcemap: true,
   },
   define: {
-    "process.env.COMMIT_SHA": `"${getSHA()}"`,
+    "process.env": {
+      COMMIT_SHA: `"${getSHA()}"`,
+    },
   },
 });

@@ -7,7 +7,7 @@ import {
   FormControl,
   FormLabel,
 } from "@chakra-ui/react";
-import Markdown from "markdown-to-jsx";
+import { Markdown } from "./markdown";
 import React, { useRef, useEffect } from "react";
 
 export const EditableMarkdown = ({
@@ -38,7 +38,7 @@ export const EditableMarkdown = ({
     py: 0.5,
     background: "gray.50",
     borderRadius: "md",
-    transition: '0.3s ease-in-out'
+    transition: "0.3s ease-in-out",
   };
   useEffect(() => {
     if (isOpen) {

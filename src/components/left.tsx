@@ -18,7 +18,7 @@ import {
   Fade,
   useToast,
 } from "@chakra-ui/react";
-import Markdown from "markdown-to-jsx";
+import { Markdown } from "./markdown";
 import React, { useState } from "react";
 import ReactCardFlip from "react-card-flip";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
