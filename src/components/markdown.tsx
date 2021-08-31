@@ -1,6 +1,6 @@
 import React from "react";
 import RemarkMathPlugin from "remark-math";
-import RehypeMathJax from "rehype-mathjax";
+import RehypeKatex from "rehype-katex";
 import RemarkGfm from "remark-gfm";
 import ReactMarkdown from "react-markdown";
 
@@ -11,7 +11,7 @@ export const Markdown = ({
   return (
     <ReactMarkdown
       remarkPlugins={[RemarkGfm, RemarkMathPlugin]}
-      rehypePlugins={[RehypeMathJax]}
+      rehypePlugins={[RehypeKatex]}
       {...props}
     />
   );
