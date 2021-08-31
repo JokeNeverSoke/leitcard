@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { Grid, GridItem } from "@chakra-ui/react";
+import "katex/dist/katex.css"
 
 import { useAppDispatch } from "./store";
 import { fetchLevelFromDB, syncEnum, syncDate, syncPref } from "./store/cards";
